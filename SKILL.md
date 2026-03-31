@@ -22,22 +22,9 @@ npm run dev                       # 启动开发服务器
 - 例如搜索 skill 商店中的 `pdf-to-md`、`docx-to-md` 等转换工具
 - 本 skill 不处理非 Markdown 格式，只接收 `.md` 内容
 
-## Usage — Two Modes
+## Usage
 
-### Mode 1: Human UI（交互式）
-
-```bash
-npm run dev
-```
-
-浏览器打开后：
-- **左侧** → 粘贴/编辑 Markdown，或从 9 个内置示例中选择
-- **右侧** → 实时 A4 预览
-- **底部控制栏** → 调节主题/字体/页边距/行高/段落间距/首行缩进
-- **预览操作** → `⌘+滚轮` 缩放 | 拖拽平移 | 双击重置
-- **打印** → `⌘P` 直接输出 A4 PDF
-
-### Mode 2: Skill API（无头导出）
+### Mode 1: Skill API（无头导出）
 
 #### CLI
 
