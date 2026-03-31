@@ -75,8 +75,25 @@ export async function fitToPage(options: FitOptions): Promise<FitResult> {
   // Determine base URL
   const baseUrl = opts.baseUrl || await startPreviewServer()
 
-  // Launch headless browser
-  const browser = await chromium.launch({ headless: true })
+  // Launch headless browser — prefer system Chrome/Edge to avoid ~150MB download
+  let browser
+  const launchOpts = { headless: true }
+  for (const channel of ['chrome', 'msedge'] as const) {
+    try {
+      browser = await chromium.launch({ ...launchOpts, channel })
+      break
+    } catch {
+      // System browser not available, try next
+    }
+  }
+  if (!browser) {
+    console.error('Error: No compatible browser found.')
+    console.error('  SmartPage tried system Chrome and Edge, but neither was available.')
+    console.error('  Install Playwright\'s bundled Chromium:')
+    console.error('    npx playwright install chromium')
+    console.error('  Or install Google Chrome / Microsoft Edge.')
+    process.exit(1)
+  }
   const page = await browser.newPage()
 
   try {

@@ -6,9 +6,11 @@
 
 ```bash
 npm install
-npx playwright install chromium   # 首次运行
 npm run dev                       # 启动开发服务器
 ```
+
+> **无头导出（Skill API）** 需要系统已安装 **Google Chrome** 或 **Microsoft Edge**。
+> 如果两者都没有，运行 `npx playwright install chromium` 下载 Playwright 内置浏览器（约 150MB）。
 
 ## What This Skill Does
 
@@ -120,7 +122,7 @@ Markdown 输入
 
 | Problem | Fix |
 |---------|-----|
-| Playwright Chromium missing | `npx playwright install chromium` |
+| No compatible browser found | 安装 Chrome/Edge，或 `npx playwright install chromium` |
 | Font not rendering | Check Google Fonts loading; use built-in fallback fonts |
 | Content still overflows | Reduce margin (`--margin 15`), reduce line height, or simplify content |
 | PDF looks blurry | PNG is 2x screenshot; PDF uses vector rendering at screen media |
