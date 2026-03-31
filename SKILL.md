@@ -4,13 +4,23 @@
 
 ## Quick Start
 
+### Option 1: npx (no clone needed)
+
 ```bash
+npx smartpage input.md --theme classic --output-dir ./out
+```
+
+> **首次运行** 会自动安装依赖。无头导出需要系统已安装 **Google Chrome** 或 **Microsoft Edge**。
+> 如果两者都没有，运行 `npx playwright install chromium` 下载 Playwright 内置浏览器（约 150MB）。
+
+### Option 2: 源码开发
+
+```bash
+git clone https://github.com/fxjhello/SmartPage.git
+cd SmartPage
 npm install
 npm run dev                       # 启动开发服务器
 ```
-
-> **无头导出（Skill API）** 需要系统已安装 **Google Chrome** 或 **Microsoft Edge**。
-> 如果两者都没有，运行 `npx playwright install chromium` 下载 Playwright 内置浏览器（约 150MB）。
 
 ## What This Skill Does
 
@@ -26,18 +36,37 @@ npm run dev                       # 启动开发服务器
 
 ## Usage
 
-### Mode 1: Skill API（无头导出）
+### Mode 1: CLI (npx / 源码)
 
-#### CLI
+#### Via npx (推荐)
+
+```bash
+npx smartpage input.md --theme classic --font "Noto Sans SC" --margin 20 --output-dir ./out
+```
+
+#### Via 源码
 
 ```bash
 npm run fit -- input.md --theme classic --font "Noto Sans SC" --margin 20 --output-dir ./out
 ```
 
-#### Module
+### Mode 2: Human UI（交互式）
+
+```bash
+npm run dev
+```
+
+浏览器打开后：
+- **左侧** → 粘贴/编辑 Markdown，或从 9 个内置示例中选择
+- **右侧** → 实时 A4 预览
+- **底部控制栏** → 调节主题/字体/页边距/行高/段落间距/首行缩进
+- **预览操作** → `⌘+滚轮` 缩放 | 拖拽平移 | 双击重置
+- **打印** → `⌘P` 直接输出 A4 PDF
+
+### Mode 3: Module (编程调用)
 
 ```typescript
-import { fitToPage } from './fit'
+import { fitToPage } from 'smartpage'
 
 const result = await fitToPage({
   markdown: content,        // 必填：Markdown 字符串
@@ -53,7 +82,7 @@ const result = await fitToPage({
 // result = { md, pdf, png, fontSize, overflow }
 ```
 
-#### CLI Options
+### CLI Options
 
 | Flag | Default | Description |
 |------|---------|-------------|
@@ -100,7 +129,8 @@ Markdown 输入
 
 | File | Role |
 |------|------|
-| `fit.ts` | Skill API 入口 — `fitToPage()` + CLI |
+| `fit.ts` | 库入口 — `fitToPage()` + `startPreviewServer()` |
+| `cli.ts` | CLI 入口 — 参数解析 + 调用 fitToPage |
 | `src/core/markdown.ts` | Markdown 解析 → Block[] |
 | `src/core/style.css` | 10 主题 CSS + 打印样式 |
 | `src/human/measure.ts` | Pretext 二分查找字号（Human UI） |

@@ -23,9 +23,19 @@ For AI agents: read https://github.com/fxjhello/SmartPage/blob/master/SKILL.md f
 
 ## 快速开始
 
+### 方式一：npx（无需克隆）
+
+```bash
+npx smartpage input.md --theme classic --output-dir ./out
+```
+
+> 首次运行自动安装依赖。无头导出需要系统已安装 **Google Chrome** 或 **Microsoft Edge**。
+> 如果两者都没有，运行 `npx playwright install chromium`。
+
+### 方式二：源码开发
+
 ```bash
 npm install
-npx playwright install chromium   # 首次运行需要
 npm run dev
 ```
 

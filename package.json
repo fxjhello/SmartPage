@@ -1,23 +1,45 @@
 {
   "name": "smartpage",
-  "private": true,
   "version": "1.0.0",
+  "description": "Markdown to A4 one-page print fitting tool — auto font sizing, 10 themes, PDF/PNG export",
   "type": "module",
+  "main": "./lib/fit.js",
+  "types": "./lib/fit.d.ts",
+  "bin": {
+    "smartpage": "./lib/cli.js"
+  },
+  "files": [
+    "lib",
+    "src",
+    "index.html",
+    "fit.html",
+    "vite.config.ts"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/fxjhello/SmartPage.git"
+  },
+  "homepage": "https://github.com/fxjhello/SmartPage#readme",
+  "bugs": {
+    "url": "https://github.com/fxjhello/SmartPage/issues"
+  },
   "scripts": {
     "dev": "vite",
     "build": "tsc && vite build",
+    "build:cli": "tsc -p tsconfig.cli.json",
     "preview": "vite preview",
-    "fit": "tsx fit.ts"
+    "fit": "tsx fit.ts",
+    "prepublishOnly": "npm run build:cli"
   },
   "dependencies": {
     "@chenglou/pretext": "^0.0.3",
     "marked": "^17.0.5",
     "playwright": "^1.58.2",
-    "typescript": "^6.0.2",
     "vite": "^8.0.3"
   },
   "devDependencies": {
     "@types/node": "^25.5.0",
-    "tsx": "^4.21.0"
+    "tsx": "^4.21.0",
+    "typescript": "^6.0.2"
   }
 }

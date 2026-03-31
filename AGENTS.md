@@ -13,9 +13,12 @@ Single-page A4 print fitting tool. Paste Markdown → binary search optimal font
 ./
 ├── index.html              # Human UI entry
 ├── fit.html                # Headless rendering entry (Playwright)
-├── fit.ts                  # Skill API — CLI + module export
-├── package.json            # dev: vite, build: tsc && vite build, fit: tsx fit.ts
-├── tsconfig.json           # strict TS, ESNext, noEmit
+├── fit.ts                  # Library — fitToPage() + startPreviewServer()
+├── cli.ts                  # CLI entry — arg parsing → fitToPage()
+├── package.json            # bin: smartpage → lib/cli.js
+├── tsconfig.json           # strict TS, ESNext, noEmit (src/)
+├── tsconfig.cli.json       # TS config for CLI build (fit.ts + cli.ts → lib/)
+├── vite.config.ts          # Multi-page build config
 ├── src/
 │   ├── core/               # Shared core
 │   │   ├── markdown.ts     # marked lexer → Block[]
@@ -41,7 +44,8 @@ Single-page A4 print fitting tool. Paste Markdown → binary search optimal font
 | Font fitting (headless) | `src/headless/fit-entry.ts` — DOM reflow binary search |
 | Markdown parsing | `src/core/markdown.ts` — `extractBlocks()` |
 | DOM rendering | `src/human/main.ts` — `buildDOM()`, `update()` |
-| Skill API | `fit.ts` — `fitToPage()` function + CLI |
+| Skill API | `fit.ts` — `fitToPage()` function |
+| CLI | `cli.ts` — arg parsing → fitToPage() |
 
 ## COMMANDS
 
@@ -49,8 +53,10 @@ Single-page A4 print fitting tool. Paste Markdown → binary search optimal font
 npm install          # or bun install
 npm run dev          # Vite dev server (human UI)
 npm run build        # tsc && vite build
+npm run build:cli    # tsc -p tsconfig.cli.json → lib/ (for npm publish)
 npm run preview      # vite preview
 npm run fit -- input.md --theme classic --font "Noto Sans SC" --margin 20 --output-dir ./out
+npx smartpage input.md --theme classic --output-dir ./out   # CLI via npx
 ```
 
 No test infrastructure exists. No ESLint/Prettier — style enforced by TypeScript strict + manual convention.
