@@ -1,6 +1,6 @@
 import { chromium } from 'playwright'
 import { readFileSync, writeFileSync, mkdirSync, existsSync } from 'node:fs'
-import { resolve, dirname, extname, basename } from 'node:path'
+import { resolve } from 'node:path'
 
 // ─── Types ───────────────────────────────────────────────────────────────────
 
@@ -111,12 +111,12 @@ export async function fitToPage(options: FitOptions): Promise<FitResult> {
     )
 
     // Export PDF (use screen media to avoid @media print conflicts)
+    await page.emulateMedia({ media: 'screen' })
     await page.pdf({
       path: pdfPath,
       format: 'A4',
       printBackground: true,
       margin: { top: 0, right: 0, bottom: 0, left: 0 },
-      media: 'screen',
     })
 
     // Export PNG (screenshot the A4 page at 2x for quality)
