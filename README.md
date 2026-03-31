@@ -2,11 +2,11 @@
 
 > Inspired by [@VladArtym](https://x.com/VladArtym) — [原始推文](https://x.com/VladArtym/status/2038368243115610351)
 
-自适应单页打印工具 —— 粘贴 Markdown，自动缩放字体，让所有内容刚好填满一张 A4 纸。
+自适应单页工具 —— 粘贴 Markdown，自动缩放字体，让所有内容刚好填满一张 A4 纸。导出 PDF，PNG 和 Markdown。
 
 ---
 
-For AI agents: read [SKILL.md](./SKILL.md) for installation and usage instructions.
+For AI agents: read https://github.com/fxjhello/SmartPage/blob/master/SKILL.md for installation and usage instructions.
 
 ---
 

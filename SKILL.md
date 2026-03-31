@@ -1,6 +1,6 @@
 # SmartPage — A4 One-Page Fitting Skill
 
-> 将 Markdown 内容自动适配到一页 A4 纸。粘贴即排版，一键打印。
+> 将 Markdown 内容自动适配到一页 A4 纸。粘贴即排版，一键导出 PDF，PNG 和 Markdown。
 
 ## Quick Start
 
