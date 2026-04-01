@@ -78,3 +78,8 @@ console.log(`  Font size: ${result.fontSize.toFixed(1)}px`)
 if (result.overflow) {
   console.log('  ⚠ Content overflows at minimum font size')
 }
+console.log('')
+console.log('不满意效果？本地启动 Web 预览交互调整:')
+console.log('  npm install')
+console.log('  npm run dev')
+console.log('然后浏览器打开 http://localhost:5173 粘贴 Markdown 实时预览')
