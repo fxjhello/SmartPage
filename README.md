@@ -6,24 +6,19 @@
 
 ---
 
-For AI agents: 
-read https://github.com/fxjhello/SmartPage/blob/master/SKILL.md for installation and usage instructions.
----
-
 ## 核心特性
 
 - **自动字号适配**：二分查找最大可用字体，内容多则缩小、内容少则放大，始终填满一页
 - **实时预览**：所见即所得的 A4 页面预览，默认 100% 适配屏幕
-- **预览交互**：`⌘+滚轮` 缩放（30%~300%）、鼠标拖拽平移、双击重置
-- **10 种主题**：经典 / 暖纸 / 学术 / 杂志 / 锤子便签 / 暗夜 / 薄荷 / 水墨 / 科技 / 牛皮纸
-- **9 个内置示例**：简历、会议议程、考试速查表、读书笔记、项目周报、产品说明卡、活动传单、菜单、求职信
-- **丰富的排版控制**：字体、页边距、行高、段落间距、首行缩进均可调节
-- **中文字体支持**：思源黑体、思源宋体、霞鹜文楷、站酷小薇体等
-- **一键打印**：`⌘P` 直接输出标准 A4 PDF
 
 ## 快速开始
 
-### 方式一：npx（无需克隆）
+### 方式一：For AI agents (复制下面这段话并发给你的智能体)
+
+```
+read https://github.com/fxjhello/SmartPage/blob/master/SKILL.md for installation and usage instructions.
+```
+### 方式二：npx（无需克隆）
 
 ```bash
 npx smartpage input.md --theme classic --output-dir ./out
@@ -32,7 +27,7 @@ npx smartpage input.md --theme classic --output-dir ./out
 > 首次运行自动安装依赖。无头导出需要系统已安装 **Google Chrome** 或 **Microsoft Edge**。
 > 如果两者都没有，运行 `npx playwright install chromium`。
 
-### 方式二：源码开发
+### 方式三：源码开发
 
 ```bash
 npm install
@@ -40,20 +35,6 @@ npm run dev
 ```
 
 浏览器打开后，在左侧粘贴 Markdown 内容，右侧即时预览 A4 效果。
-
-
-## 工作原理
-
-```
-输入 Markdown
-  → marked.lexer() 提取文本块
-  → Pretext prepare() + layout() 测量每个块的高度（人类 UI）
-  → DOM reflow 二分查找（无头模式）
-  → 二分查找（6px ~ 72px，精度 0.25px，~8 次迭代）
-  → 找到最大字号使总高度 ≤ A4 可打印区域
-  → marked.parse() 渲染 HTML + 应用字号到预览
-  → Playwright 导出 PDF + PNG
-```
 
 ## 应用场景
 
@@ -71,20 +52,6 @@ npm run dev
 
 适用于任何**需要精确控制在一页纸内**的内容。
 
-## 主题预览
-
-| 主题 | 风格 |
-|------|------|
-| 经典 | 白底黑字，通用默认 |
-| 暖纸 | 奶油色底，棕色标题 |
-| 学术 | 藏蓝标题，h2 下划线 |
-| 杂志 | 红色标题，h1 大写，粗引用线 |
-| 锤子便签 | 米白底，红褐色标题，虚线分隔 |
-| 暗夜 | 深蓝黑底，金色标题 |
-| 薄荷 | 淡绿底，翠绿标题 |
-| 水墨 | 宣纸色底，纯黑标题，大字距 |
-| 科技 | 浅蓝灰底，亮蓝标题 |
-| 牛皮纸 | 深驼色底，深棕标题 |
 
 ## 技术栈
 
