@@ -21,6 +21,7 @@ let textarea: HTMLTextAreaElement
 let fitScale = 1
 let userZoom = 1
 let settingsModal: HTMLElement | null = null
+let loadingOverlay: HTMLElement | null = null
 
 // ─── Markdown Toolbar Helpers ───────────────────────────────────
 
@@ -119,6 +120,23 @@ function openSettingsModal(onChange: () => void): void {
   })
 }
 
+// ─── Export Loading State ───────────────────────────────────────
+
+function showExportLoading(text: string): void {
+  if (loadingOverlay) loadingOverlay.remove()
+  loadingOverlay = document.createElement('div')
+  loadingOverlay.className = 'export-loading-overlay'
+  loadingOverlay.innerHTML = `<div class="export-loading-spinner"></div><div class="export-loading-text">${text}</div>`
+  document.body.appendChild(loadingOverlay)
+}
+
+function hideExportLoading(): void {
+  if (loadingOverlay) {
+    loadingOverlay.remove()
+    loadingOverlay = null
+  }
+}
+
 // ─── Export Functions ───────────────────────────────────────────
 
 async function exportPNG(): Promise<void> {
@@ -135,7 +153,8 @@ async function exportPNG(): Promise<void> {
 
 async function exportPDF(): Promise<void> {
   try {
-    const dataUrl = await toJpeg(a4Page, { quality: 0.95, pixelRatio: 2 })
+    showExportLoading('正在生成 PDF...')
+    const dataUrl = await toJpeg(a4Page, { quality: 0.92, pixelRatio: 1 })
     const pdf = new jsPDF({
       orientation: 'portrait',
       unit: 'mm',
@@ -147,6 +166,8 @@ async function exportPDF(): Promise<void> {
     pdf.save('smartpage.pdf')
   } catch (err) {
     console.error('PDF export failed:', err)
+  } finally {
+    hideExportLoading()
   }
 }
 
