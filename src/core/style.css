@@ -40,7 +40,7 @@ body {
 /* ─── App Layout ─────────────────────────── */
 #app, .app {
   display: grid;
-  grid-template-columns: 540px 1fr;
+  grid-template-columns: 1fr 1fr;
   grid-template-rows: auto 1fr;
   grid-template-areas:
     "topbar topbar"
@@ -108,23 +108,58 @@ body {
   display: inline;
 }
 
-.btn-print {
+.btn-export {
   background: var(--accent);
   color: #ffffff;
   border: none;
-  padding: 6px 16px;
+  padding: 6px 14px;
   border-radius: var(--radius);
   font-family: var(--font-ui);
   font-size: 12px;
   font-weight: 600;
   letter-spacing: 0.03em;
-  text-transform: uppercase;
   cursor: pointer;
   transition: opacity 0.15s;
 }
 
-.btn-print:hover {
+.btn-export:hover {
   opacity: 0.85;
+}
+
+.export-wrapper {
+  position: relative;
+}
+
+.export-menu {
+  position: absolute;
+  top: 100%;
+  right: 0;
+  margin-top: 4px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 100;
+  min-width: 120px;
+  overflow: hidden;
+}
+
+.export-menu-item {
+  display: block;
+  width: 100%;
+  padding: 8px 14px;
+  background: none;
+  border: none;
+  text-align: left;
+  font-family: var(--font-ui);
+  font-size: 12px;
+  color: var(--text-primary);
+  cursor: pointer;
+  transition: background 0.1s;
+}
+
+.export-menu-item:hover {
+  background: var(--accent-dim);
 }
 
 /* ─── Left Panel ─────────────────────────── */
@@ -159,19 +194,84 @@ body {
   justify-content: space-between;
 }
 
-.sample-select {
-  padding: 3px 8px;
+/* ─── Markdown Toolbar ───────────────────── */
+.toolbar-container {
+  padding: 4px 16px 0;
+  border-bottom: 1px solid var(--border);
+}
+
+.md-toolbar {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 2px;
+}
+
+.md-toolbar-btn {
+  padding: 4px 8px;
   background: var(--bg-input);
-  border: 1px solid var(--border);
-  border-radius: var(--radius);
+  border: 1px solid transparent;
+  border-radius: 4px;
   color: var(--text-primary);
   font-family: var(--font-ui);
-  font-size: 11px;
-  font-weight: 400;
-  text-transform: none;
-  letter-spacing: normal;
+  font-size: 12px;
+  font-weight: 600;
   cursor: pointer;
+  transition: all 0.1s;
+  line-height: 1.4;
+}
+
+.md-toolbar-btn:hover {
+  background: var(--accent-dim);
+  border-color: var(--border);
+}
+
+/* ─── Left Panel (Editor) ────────────────── */
+.left-panel {
+  grid-area: left;
+  display: flex;
+  flex-direction: column;
+  border-right: 1px solid var(--border);
+  background: var(--bg-panel);
+  overflow: hidden;
+  min-height: 0;
+  min-width: 0;
+}
+
+.textarea-wrapper {
+  flex: 1 1 0;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.textarea-header {
+  padding: 12px 16px 8px;
+  font-size: 11px;
+  font-weight: 600;
+  text-transform: uppercase;
+  letter-spacing: 0.08em;
+  color: var(--text-muted);
+}
+
+.input-textarea {
+  flex: 1 1 0;
+  width: 100%;
+  padding: 0 16px 16px;
+  background: transparent;
+  border: none;
+  resize: none;
+  font-family: var(--font-mono);
+  font-size: 13px;
+  line-height: 1.6;
+  color: var(--text-primary);
   outline: none;
+  overflow-y: auto;
+  min-height: 0;
+}
+
+.input-textarea::placeholder {
+  color: var(--text-muted);
 }
 
 .sample-select:focus {
@@ -285,15 +385,94 @@ body {
 .right-panel {
   grid-area: right;
   overflow: auto;
-  padding: 30px;
+  padding: 60px 30px 30px;
   background: var(--bg-app);
   min-height: 0;
   min-width: 0;
   cursor: grab;
-  /* subtle cross pattern */
+  position: relative;
   background-image:
     radial-gradient(circle, #d5d0c6 1px, transparent 1px);
   background-size: 20px 20px;
+}
+
+/* ─── Settings Button ────────────────────── */
+.settings-btn {
+  position: absolute;
+  top: 12px;
+  right: 16px;
+  z-index: 10;
+  padding: 6px 14px;
+  background: var(--bg-panel);
+  border: 1px solid var(--border);
+  border-radius: var(--radius);
+  color: var(--text-primary);
+  font-family: var(--font-ui);
+  font-size: 12px;
+  font-weight: 600;
+  cursor: pointer;
+  transition: all 0.15s;
+  box-shadow: 0 2px 6px rgba(0, 0, 0, 0.08);
+}
+
+.settings-btn:hover {
+  background: var(--accent-dim);
+  border-color: var(--border-focus);
+}
+
+/* ─── Settings Modal ─────────────────────── */
+.modal-overlay {
+  position: fixed;
+  inset: 0;
+  background: rgba(0, 0, 0, 0.4);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(2px);
+}
+
+.modal-content {
+  background: var(--bg-panel);
+  border-radius: 12px;
+  box-shadow: 0 8px 32px rgba(0, 0, 0, 0.2);
+  width: 420px;
+  max-height: 80vh;
+  overflow-y: auto;
+}
+
+.modal-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 16px 20px;
+  border-bottom: 1px solid var(--border);
+}
+
+.modal-header span {
+  font-size: 14px;
+  font-weight: 700;
+  color: var(--text-primary);
+}
+
+.modal-close {
+  background: none;
+  border: none;
+  font-size: 18px;
+  color: var(--text-muted);
+  cursor: pointer;
+  padding: 4px 8px;
+  border-radius: 4px;
+  transition: all 0.15s;
+}
+
+.modal-close:hover {
+  background: var(--accent-dim);
+  color: var(--text-primary);
+}
+
+.modal-body {
+  padding: 16px 20px;
 }
 
 .right-panel.dragging {

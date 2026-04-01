@@ -1,6 +1,6 @@
 # SmartPage AGENTS.md
 
-**Generated:** 2026-03-31
+**Generated:** 2026-04-01
 **Stack:** Vite + TypeScript | @chenglou/pretext | marked | Playwright
 
 ## OVERVIEW
@@ -56,7 +56,7 @@ npm run build        # tsc && vite build
 npm run build:cli    # tsc -p tsconfig.cli.json → lib/ (for npm publish)
 npm run preview      # vite preview
 npm run fit -- input.md --theme classic --font "Noto Sans SC" --margin 20 --output-dir ./out
-npx smartpage input.md --theme classic --output-dir ./out   # CLI via npx
+npm smartpage input.md --theme classic --output-dir ./out   # CLI via npm
 ```
 
 No test infrastructure exists. No ESLint/Prettier — style enforced by TypeScript strict + manual convention.

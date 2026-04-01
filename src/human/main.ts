@@ -18,6 +18,137 @@ let statusZoom: HTMLElement
 let textarea: HTMLTextAreaElement
 let fitScale = 1
 let userZoom = 1
+let settingsModal: HTMLElement | null = null
+
+// ─── Markdown Toolbar Helpers ───────────────────────────────────
+
+function insertWrap(before: string, after: string = before): void {
+  const start = textarea.selectionStart
+  const end = textarea.selectionEnd
+  const selected = textarea.value.substring(start, end)
+  const replacement = before + (selected || 'text') + after
+  textarea.setRangeText(replacement, start, end, 'select')
+  textarea.focus()
+  scheduleUpdate()
+}
+
+function insertLine(prefix: string): void {
+  const start = textarea.selectionStart
+  const lineStart = textarea.value.lastIndexOf('\n', start - 1) + 1
+  const lineEnd = textarea.value.indexOf('\n', start)
+  const line = textarea.value.substring(lineStart, lineEnd === -1 ? undefined : lineEnd)
+  const replacement = prefix + line
+  textarea.setRangeText(replacement, lineStart, lineEnd === -1 ? textarea.value.length : lineEnd, 'end')
+  textarea.focus()
+  scheduleUpdate()
+}
+
+function buildToolbar(container: HTMLElement): void {
+  const toolbar = document.createElement('div')
+  toolbar.className = 'md-toolbar'
+
+  const buttons: { label: string; action: () => void; title?: string }[] = [
+    { label: 'B', action: () => insertWrap('**'), title: '粗体' },
+    { label: 'I', action: () => insertWrap('*'), title: '斜体' },
+    { label: 'S', action: () => insertWrap('~~'), title: '删除线' },
+    { label: 'H1', action: () => insertLine('# '), title: '一级标题' },
+    { label: 'H2', action: () => insertLine('## '), title: '二级标题' },
+    { label: 'H3', action: () => insertLine('### '), title: '三级标题' },
+    { label: '•', action: () => insertLine('- '), title: '无序列表' },
+    { label: '1.', action: () => insertLine('1. '), title: '有序列表' },
+    { label: '[]', action: () => insertWrap('[', '](url)'), title: '链接' },
+    { label: '</>', action: () => insertWrap('`'), title: '行内代码' },
+    { label: '```', action: () => insertWrap('\n```\n', '\n```\n'), title: '代码块' },
+    { label: '—', action: () => insertLine('\n---\n'), title: '分隔线' },
+    { label: '>', action: () => insertLine('> '), title: '引用' },
+  ]
+
+  for (const btn of buttons) {
+    const b = document.createElement('button')
+    b.type = 'button'
+    b.className = 'md-toolbar-btn'
+    b.textContent = btn.label
+    b.title = btn.title || ''
+    b.addEventListener('click', btn.action)
+    toolbar.appendChild(b)
+  }
+
+  container.appendChild(toolbar)
+}
+
+// ─── Settings Modal ─────────────────────────────────────────────
+
+function openSettingsModal(onChange: () => void): void {
+  if (settingsModal) {
+    settingsModal.remove()
+  }
+
+  const overlay = document.createElement('div')
+  overlay.className = 'modal-overlay'
+
+  const modal = document.createElement('div')
+  modal.className = 'modal-content'
+
+  const header = document.createElement('div')
+  header.className = 'modal-header'
+
+  const title = document.createElement('span')
+  title.textContent = '样式设置'
+
+  const closeBtn = document.createElement('button')
+  closeBtn.className = 'modal-close'
+  closeBtn.textContent = '✕'
+  closeBtn.addEventListener('click', () => { overlay.remove(); settingsModal = null })
+
+  header.append(title, closeBtn)
+
+  const body = document.createElement('div')
+  body.className = 'modal-body'
+
+  createControls(body, onChange)
+
+  modal.append(header, body)
+  overlay.appendChild(modal)
+  document.body.appendChild(overlay)
+  settingsModal = overlay
+
+  overlay.addEventListener('click', (e) => {
+    if (e.target === overlay) { overlay.remove(); settingsModal = null }
+  })
+}
+
+// ─── Export Functions ───────────────────────────────────────────
+
+async function exportPNG(): Promise<void> {
+  try {
+    const canvas = await (window as any).html2canvas?.(a4Page, { scale: 2 })
+    if (!canvas) {
+      console.error('html2canvas not loaded')
+      return
+    }
+    const link = document.createElement('a')
+    link.download = 'smartpage.png'
+    link.href = canvas.toDataURL('image/png')
+    link.click()
+  } catch (err) {
+    console.error('PNG export failed:', err)
+  }
+}
+
+function exportPDF(): void {
+  window.print()
+}
+
+function exportMD(): void {
+  const blob = new Blob([textarea.value], { type: 'text/markdown' })
+  const link = document.createElement('a')
+  link.download = 'smartpage.md'
+  link.href = URL.createObjectURL(blob)
+  link.click()
+  URL.revokeObjectURL(link.href)
+}
+
+// ─── Build DOM ──────────────────────────────────────────────────
 
 function buildDOM(): void {
   const app = document.getElementById('app')!
@@ -47,12 +178,46 @@ function buildDOM(): void {
   statusZoom.textContent = '100%'
   statusZoom.title = '⌘+滚轮缩放，双击重置'
 
-  const printBtn = document.createElement('button')
-  printBtn.className = 'btn-print'
-  printBtn.textContent = '打印 ⌘P'
-  printBtn.addEventListener('click', () => window.print())
+  // Export dropdown
+  const exportWrapper = document.createElement('div')
+  exportWrapper.className = 'export-wrapper'
 
-  statusArea.append(statusFontSize, statusZoom, statusOverflow, printBtn)
+  const exportBtn = document.createElement('button')
+  exportBtn.className = 'btn-export'
+  exportBtn.textContent = '导出 ▾'
+
+  const exportMenu = document.createElement('div')
+  exportMenu.className = 'export-menu'
+  exportMenu.style.display = 'none'
+
+  const exportItems = [
+    { label: '导出 PDF', action: exportPDF },
+    { label: '导出 PNG', action: exportPNG },
+    { label: '导出 MD', action: exportMD },
+  ]
+
+  for (const item of exportItems) {
+    const btn = document.createElement('button')
+    btn.className = 'export-menu-item'
+    btn.textContent = item.label
+    btn.addEventListener('click', () => {
+      exportMenu.style.display = 'none'
+      item.action()
+    })
+    exportMenu.appendChild(btn)
+  }
+
+  exportBtn.addEventListener('click', (e) => {
+    e.stopPropagation()
+    const visible = exportMenu.style.display === 'block'
+    exportMenu.style.display = visible ? 'none' : 'block'
+  })
+
+  document.addEventListener('click', () => { exportMenu.style.display = 'none' })
+
+  exportWrapper.append(exportBtn, exportMenu)
+
+  statusArea.append(statusFontSize, statusZoom, statusOverflow, exportWrapper)
   topbar.append(title, statusArea)
 
   // Left panel
@@ -64,59 +229,35 @@ function buildDOM(): void {
 
   const textareaHeader = document.createElement('div')
   textareaHeader.className = 'textarea-header'
+  textareaHeader.textContent = '粘贴 / 编辑 Markdown'
 
-  const headerLabel = document.createElement('span')
-  headerLabel.textContent = '粘贴 / 编辑 Markdown'
-
-  const sampleSelect = document.createElement('select')
-  sampleSelect.className = 'sample-select'
-  const emptyOpt = document.createElement('option')
-  emptyOpt.value = ''
-  emptyOpt.textContent = '加载示例…'
-  sampleSelect.appendChild(emptyOpt)
-  for (const s of SAMPLES) {
-    const opt = document.createElement('option')
-    opt.value = s.value
-    opt.textContent = s.label
-    sampleSelect.appendChild(opt)
-  }
-  sampleSelect.value = SAMPLES[0].value
-  sampleSelect.addEventListener('change', () => {
-    const sample = SAMPLES.find(s => s.value === sampleSelect.value)
-    if (sample) {
-      textarea.value = sample.content
-      scheduleUpdate()
-    }
-  })
-
-  textareaHeader.append(headerLabel, sampleSelect)
+  // Markdown toolbar
+  const toolbarContainer = document.createElement('div')
+  toolbarContainer.className = 'toolbar-container'
+  buildToolbar(toolbarContainer)
 
   textarea = document.createElement('textarea')
   textarea.className = 'input-textarea'
   textarea.placeholder = '在此粘贴 Markdown 内容...\n\n支持粘贴后编辑修改\n\n# 标题\n\n正文内容...\n\n- 列表项'
   textarea.spellcheck = false
 
-  textareaWrapper.append(textareaHeader, textarea)
-
-  const controlsSection = document.createElement('div')
-  controlsSection.className = 'controls-section'
-
-  const controlsHeader = document.createElement('div')
-  controlsHeader.className = 'controls-header'
-  controlsHeader.textContent = '样式设置'
-
-  const controlsBody = document.createElement('div')
-  createControls(controlsBody, () => {
-    clearMeasureCache()
-    scheduleUpdate()
-  })
-
-  controlsSection.append(controlsHeader, controlsBody)
-  leftPanel.append(textareaWrapper, controlsSection)
+  textareaWrapper.append(textareaHeader, toolbarContainer, textarea)
+  leftPanel.appendChild(textareaWrapper)
 
   // Right panel
   const rightPanel = document.createElement('div')
   rightPanel.className = 'right-panel'
+
+  // Settings button
+  const settingsBtn = document.createElement('button')
+  settingsBtn.className = 'settings-btn'
+  settingsBtn.textContent = '⚙ 设置'
+  settingsBtn.addEventListener('click', () => {
+    openSettingsModal(() => {
+      clearMeasureCache()
+      scheduleUpdate()
+    })
+  })
 
   a4Page = document.createElement('div')
   a4Page.className = 'a4-page'
@@ -133,20 +274,21 @@ function buildDOM(): void {
   a4Wrapper = document.createElement('div')
   a4Wrapper.className = 'a4-wrapper'
   a4Wrapper.appendChild(a4Page)
-  rightPanel.appendChild(a4Wrapper)
+
+  rightPanel.append(settingsBtn, a4Wrapper)
 
   app.append(topbar, leftPanel, rightPanel)
 
-  // Events: textarea supports both paste and live editing
+  // Events
   textarea.addEventListener('input', scheduleUpdate)
 
-  // Auto-scale A4 page to fit the right panel
+  // Auto-scale A4 page
   const resizeObserver = new ResizeObserver(() => updateA4Scale())
   resizeObserver.observe(rightPanel)
 
-  // Cmd + scroll wheel to zoom preview
+  // Cmd + scroll zoom
   rightPanel.addEventListener('wheel', (e) => {
-    if (!e.metaKey) return
+    if (!e.metaKey && !e.ctrlKey) return
     e.preventDefault()
     const factor = e.deltaY > 0 ? 0.95 : 1.05
     userZoom = Math.max(0.3, Math.min(3, userZoom * factor))
@@ -154,7 +296,7 @@ function buildDOM(): void {
     updateZoomStatus()
   }, { passive: false })
 
-  // Mouse drag to pan preview
+  // Drag to pan
   let isDragging = false
   let dragStartX = 0
   let dragStartY = 0
@@ -184,7 +326,7 @@ function buildDOM(): void {
     rightPanel.classList.remove('dragging')
   })
 
-  // Double-click to reset zoom
+  // Double-click reset zoom
   rightPanel.addEventListener('dblclick', () => {
     userZoom = 1
     applyScale()
@@ -240,7 +382,6 @@ async function update(): Promise<void> {
 
   a4Placeholder.style.display = 'none'
 
-  // Only load font when it changes
   if (lastLoadedFont !== settings.fontFamily) {
     await Promise.all([
       document.fonts.load(`16px "${settings.fontFamily}"`),
@@ -249,24 +390,20 @@ async function update(): Promise<void> {
     lastLoadedFont = settings.fontFamily
   }
 
-  // Extract blocks and find optimal font size via Pretext
   const blocks = extractBlocks(markdown)
   const { fontSize, overflow } = findOptimalFontSize(blocks, settings)
 
-  // Update status bar
   statusFontSize.textContent = `${fontSize.toFixed(1)}px`
   statusOverflow.classList.toggle('visible', overflow)
 
-  // Render Markdown to HTML and apply to A4 page
   const html = await parse(markdown)
   let currentFontSize = fontSize
   applyStyles(settings, currentFontSize)
 
-  // Use DOMParser to safely set content
   const doc = new DOMParser().parseFromString(html, 'text/html')
   a4Content.replaceChildren(...Array.from(doc.body.childNodes).map(n => n.cloneNode(true)))
 
-  // DOM fallback: if content overflows, binary search for fitting font size (~5 reflows instead of ~20)
+  // DOM fallback binary search
   const pageStyle = getComputedStyle(a4Page)
   const availableHeight = a4Page.clientHeight - parseFloat(pageStyle.paddingTop) - parseFloat(pageStyle.paddingBottom)
 
@@ -295,7 +432,6 @@ const THEME_CLASSES = [
 ]
 
 function applyStyles(settings: StyleSettings, fontSize: number): void {
-  // Theme class
   a4Page.classList.remove(...THEME_CLASSES)
   a4Page.classList.add(`theme-${settings.theme}`)
 
@@ -310,7 +446,6 @@ function applyStyles(settings: StyleSettings, fontSize: number): void {
 // Init
 document.addEventListener('DOMContentLoaded', () => {
   buildDOM()
-  // Pre-fill with default sample (resume)
   textarea.value = SAMPLES[0].content
   scheduleUpdate()
 })
