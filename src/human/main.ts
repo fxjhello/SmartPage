@@ -121,6 +121,29 @@ function openSettingsModal(onChange: () => void): void {
   })
 }
 
+// ─── Import Toast Notification ──────────────────────────────────
+
+function showImportToast(fileName: string): void {
+  const existing = document.querySelector('.import-toast')
+  if (existing) existing.remove()
+
+  const toast = document.createElement('div')
+  toast.className = 'import-toast'
+  toast.innerHTML = `<span>✅ 已导入: <strong>${fileName}</strong></span><span class="import-toast-hint">提示：PDF 解析为纯本地算法，复杂排版可能丢失。如需更精准的结构还原，可尝试使用基于大模型的第三方服务（如 Kimi、通义千问等）先将 PDF 转为 Markdown，再粘贴到此处。</span>`
+  document.body.appendChild(toast)
+
+  // Trigger animation
+  requestAnimationFrame(() => {
+    toast.classList.add('import-toast-visible')
+  })
+
+  // Auto-dismiss after 8 seconds
+  setTimeout(() => {
+    toast.classList.remove('import-toast-visible')
+    toast.addEventListener('transitionend', () => toast.remove(), { once: true })
+  }, 8000)
+}
+
 // ─── Export Loading State ───────────────────────────────────────
 
 function showExportLoading(text: string): void {
@@ -283,6 +306,7 @@ function buildDOM(): void {
         textarea.value = md
         localStorage.setItem(CACHE_KEY, md)
         scheduleUpdate()
+        showImportToast(file.name)
       } catch (err) {
         textarea.value = `解析失败: ${err instanceof Error ? err.message : '未知错误'}`
       }
