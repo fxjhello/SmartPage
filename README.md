@@ -1,4 +1,4 @@
-# SmartPage 一页印
+# SmartPage 智能一页
 
 > Inspired by [@VladArtym](https://x.com/VladArtym) — [原始推文](https://x.com/VladArtym/status/2038368243115610351)
 
@@ -6,8 +6,8 @@
 
 ---
 
-For AI agents: read https://github.com/fxjhello/SmartPage/blob/master/SKILL.md for installation and usage instructions.
-
+For AI agents: 
+read https://github.com/fxjhello/SmartPage/blob/master/SKILL.md for installation and usage instructions.
 ---
 
 ## 核心特性
@@ -39,15 +39,8 @@ npm install
 npm run dev
 ```
 
-浏览器打开后，在左侧粘贴 Markdown 内容，右侧即时预览 A4 效果。按 `⌘P` 打印或导出 PDF。
+浏览器打开后，在左侧粘贴 Markdown 内容，右侧即时预览 A4 效果。
 
-### 预览操作
-
-| 操作 | 方式 |
-|------|------|
-| 缩放 | `⌘` + 鼠标滚轮 |
-| 平移 | 鼠标拖拽 |
-| 重置缩放 | 双击预览区域 |
 
 ## 工作原理
 
