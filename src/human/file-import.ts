@@ -110,10 +110,84 @@ export async function parsePdf(file: File): Promise<string> {
   for (let i = 1; i <= pdf.numPages; i++) {
     const page = await pdf.getPage(i)
     const content = await page.getTextContent()
-    const text = content.items
-      .map(item => ('str' in item ? item.str : ''))
-      .join('')
-    pages.push(text)
+    const textItems = content.items
+      .filter(item => 'str' in item && item.str.trim())
+      .map(item => {
+        const t = item as any
+        return {
+          str: t.str.trim(),
+          x: t.transform[4],
+          y: Math.round(t.transform[5]),
+          fontSize: Math.round(Math.sqrt(t.transform[0] ** 2 + t.transform[1] ** 2)),
+        }
+      })
+
+    if (textItems.length === 0) {
+      pages.push('')
+      continue
+    }
+
+    // Sort by Y (top-to-bottom), then X (left-to-right)
+    textItems.sort((a, b) => b.y - a.y || a.x - b.x)
+
+    // Group into lines by Y proximity (threshold: 4px)
+    const lines: { items: typeof textItems; y: number }[] = []
+    let currentLine = [textItems[0]]
+    let currentY = textItems[0].y
+    for (let j = 1; j < textItems.length; j++) {
+      if (Math.abs(textItems[j].y - currentY) <= 4) {
+        currentLine.push(textItems[j])
+      } else {
+        currentLine.sort((a, b) => a.x - b.x)
+        lines.push({ items: currentLine, y: currentY })
+        currentLine = [textItems[j]]
+        currentY = textItems[j].y
+      }
+    }
+    currentLine.sort((a, b) => a.x - b.x)
+    lines.push({ items: currentLine, y: currentY })
+
+    // Detect base font size (most common)
+    const freq: Record<number, number> = {}
+    for (const item of textItems) {
+      freq[item.fontSize] = (freq[item.fontSize] || 0) + 1
+    }
+    const baseFontSize = Number(Object.entries(freq).sort((a, b) => b[1] - a[1])[0]?.[0]) || 12
+
+    // Detect average line gap for paragraph detection
+    const gaps: number[] = []
+    for (let j = 1; j < lines.length; j++) {
+      gaps.push(lines[j - 1].y - lines[j].y)
+    }
+    const avgGap = gaps.length > 0 ? gaps.reduce((a, b) => a + b, 0) / gaps.length : 12
+    const paragraphThreshold = avgGap * 1.8
+
+    // Build Markdown with heading/paragraph detection
+    const mdLines: string[] = []
+    for (let j = 0; j < lines.length; j++) {
+      const lineText = lines[j].items.map(it => it.str).join(' ')
+      const lineFontSize = Math.round(lines[j].items.reduce((s, it) => s + it.fontSize, 0) / lines[j].items.length)
+      const gap = j > 0 ? lines[j - 1].y - lines[j].y : 0
+
+      // Heading detection: font size > base + 30%
+      if (lineFontSize >= baseFontSize * 1.3) {
+        const level = lineFontSize >= baseFontSize * 2 ? 1 : lineFontSize >= baseFontSize * 1.6 ? 2 : 3
+        mdLines.push('')
+        mdLines.push(`${'#'.repeat(level)} ${lineText}`)
+        mdLines.push('')
+      }
+      // Paragraph break: gap > threshold
+      else if (gap > paragraphThreshold && gap > 0) {
+        mdLines.push('')
+        mdLines.push(lineText)
+      }
+      // Normal line
+      else {
+        mdLines.push(lineText)
+      }
+    }
+
+    pages.push(mdLines.join('\n').trim())
   }
 
   return pages.join('\n\n').trim()
