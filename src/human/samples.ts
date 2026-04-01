@@ -8,7 +8,9 @@ export const SAMPLES: Sample[] = [
   {
     label: '个人简历',
     value: 'resume',
-    content: `# 张伟
+    content: `![avatar](https://images.unsplash.com/photo-1507003211169-0a1dd7228f2d?w=120&h=120&fit=crop&crop=face)
+
+# 张伟
 
 **高级软件工程师** | 上海
 zhang.wei@email.com | +86 138-0000-0000

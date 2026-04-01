@@ -40,7 +40,7 @@ body {
 /* ─── App Layout ─────────────────────────── */
 #app, .app {
   display: grid;
-  grid-template-columns: 1fr 1fr;
+  grid-template-columns: 2fr 3fr;
   grid-template-rows: auto 1fr;
   grid-template-areas:
     "topbar topbar"
@@ -655,6 +655,22 @@ body {
 
 .a4-page strong { font-weight: 700; }
 .a4-page em { font-style: italic; }
+
+.a4-page h1:first-child + p > img:first-child {
+  float: left;
+  width: 80px;
+  height: 80px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 1em;
+  margin-bottom: 0.5em;
+  border: 2px solid var(--heading-color);
+}
+
+.a4-page p > img {
+  max-width: 100%;
+  height: auto;
+}
 
 .a4-page table {
   border-collapse: collapse;

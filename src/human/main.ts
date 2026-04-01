@@ -443,9 +443,16 @@ function applyStyles(settings: StyleSettings, fontSize: number): void {
   a4Page.style.setProperty('--fi', `${settings.firstLineIndent}em`)
 }
 
+const CACHE_KEY = 'smartpage-md'
+
 // Init
 document.addEventListener('DOMContentLoaded', () => {
   buildDOM()
-  textarea.value = SAMPLES[0].content
+  const cached = localStorage.getItem(CACHE_KEY)
+  textarea.value = cached ?? SAMPLES[0].content
   scheduleUpdate()
+
+  textarea.addEventListener('input', () => {
+    localStorage.setItem(CACHE_KEY, textarea.value)
+  })
 })
