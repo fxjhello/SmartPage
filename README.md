@@ -16,7 +16,7 @@
 ### 方式一：For AI agents (复制下面这段话并发给你的智能体)
 
 ```
-read https://github.com/fxjhello/SmartPage/blob/master/SKILL.md for installation and usage instructions.
+read https://github.com/fxjhello/SmartPage/blob/master/clawhub/SKILL.md for installation and usage instructions.
 ```
 ### 方式二：npx（无需克隆）
 
