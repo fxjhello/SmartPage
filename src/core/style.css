@@ -197,7 +197,7 @@ body {
 /* ─── Import Toast ─────────────────────────── */
 .import-toast {
   position: fixed;
-  bottom: -200px;
+  top: -200px;
   left: 50%;
   transform: translateX(-50%);
   background: var(--bg-panel);
@@ -212,11 +212,11 @@ body {
   max-width: 520px;
   min-width: 340px;
   opacity: 0;
-  transition: bottom 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
+  transition: top 0.4s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.4s ease;
 }
 
 .import-toast-visible {
-  bottom: 24px;
+  top: 24px;
   opacity: 1;
 }
 
