@@ -656,7 +656,7 @@ body {
 .a4-page strong { font-weight: 700; }
 .a4-page em { font-style: italic; }
 
-.a4-page h1:first-child + p > img:first-child {
+.a4-page h1 + p > img:first-child {
   float: left;
   width: 80px;
   height: 80px;

@@ -1,3 +1,4 @@
+import { toPng, toJpeg } from 'html-to-image'
 import { parse } from 'marked'
 import { extractBlocks } from '../core/markdown'
 import { findOptimalFontSize, clearMeasureCache } from './measure'
@@ -5,6 +6,7 @@ import { createControls, getSettings } from './controls'
 import { SAMPLES } from './samples'
 import type { StyleSettings } from './controls'
 import '../core/style.css'
+import jsPDF from 'jspdf'
 
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 let lastLoadedFont = ''
@@ -121,22 +123,31 @@ function openSettingsModal(onChange: () => void): void {
 
 async function exportPNG(): Promise<void> {
   try {
-    const canvas = await (window as any).html2canvas?.(a4Page, { scale: 2 })
-    if (!canvas) {
-      console.error('html2canvas not loaded')
-      return
-    }
+    const dataUrl = await toPng(a4Page, { quality: 1, pixelRatio: 2 })
     const link = document.createElement('a')
     link.download = 'smartpage.png'
-    link.href = canvas.toDataURL('image/png')
+    link.href = dataUrl
     link.click()
   } catch (err) {
     console.error('PNG export failed:', err)
   }
 }
 
-function exportPDF(): void {
-  window.print()
+async function exportPDF(): Promise<void> {
+  try {
+    const dataUrl = await toJpeg(a4Page, { quality: 0.95, pixelRatio: 2 })
+    const pdf = new jsPDF({
+      orientation: 'portrait',
+      unit: 'mm',
+      format: 'a4',
+    })
+    const pageWidth = pdf.internal.pageSize.getWidth()
+    const pageHeight = pdf.internal.pageSize.getHeight()
+    pdf.addImage(dataUrl, 'JPEG', 0, 0, pageWidth, pageHeight)
+    pdf.save('smartpage.pdf')
+  } catch (err) {
+    console.error('PDF export failed:', err)
+  }
 }
 
 function exportMD(): void {
