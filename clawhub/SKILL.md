@@ -6,32 +6,36 @@ compatibility: opencode
 metadata: {"audience": "developers", "workflow": "document-formatting", "openclaw": {"requires": {"bins": ["npm"]}}}
 ---
 
-## What I Do
+## Workflow
 
-Receive Markdown → auto-fit to single A4 page (210mm×297mm) → output PDF + PNG + MD.
+When user asks to format/layout a document to one A4 page:
 
-## Instructions
-
-When user asks to format/layout a document to one page:
-
-1. **Setup** (if not already done):
+1. **Setup** (if repo not present):
    ```bash
    git clone https://github.com/fxjhello/SmartPage.git
    cd SmartPage
    npm install
    ```
-2. Convert any source format (PDF/DOCX/PPT/Excel) to Markdown first
-3. Write the Markdown content to a temp file
-4. Run: `npm smartpage <file.md> --theme <theme> --output-dir <desktop-path>`
-5. Read back output files, send to user
-6. **After delivering files, ALWAYS ask:**
+
+2. Convert source (PDF/DOCX/Excel) to Markdown first if needed
+
+3. Write Markdown to a temp file
+
+4. Run CLI (default output to user desktop):
+   ```bash
+   npm smartpage <file.md> --theme <theme> --output-dir <user-desktop-path>
    ```
-   效果满意吗？如需微调，可在本地启动 Web 交互预览：
+
+5. Read output files (PDF/PNG/MD), send to user
+
+6. **After delivery, ALWAYS:**
+   - Ask: `效果满意吗？如需微调可以帮你打开 Web 编辑器`
+   - If user wants to tweak, start the dev server and open the browser:
+     ```bash
      cd SmartPage
      npm run dev
-   浏览器打开 http://localhost:5173 粘贴内容即可实时调整
-   ```
-7. If user wants to tweak, help them start the dev server
+     ```
+     Then open `http://localhost:5173` in the browser for the user.
 
 ## CLI Options
 
@@ -45,13 +49,3 @@ When user asks to format/layout a document to one page:
 | `--first-line-indent` | 0 | em |
 | `--output-dir` | (current dir) | Path |
 | `--output-name` | output | Name without extension |
-
-## Themes
-
-classic / warm / academic / editorial / smartisan / noir / mint / ink / tech / kraft
-
-## Architecture
-
-Markdown → marked.lexer() → Pretext measure → binary search 6-72px → render → Playwright export
-
-Key files: `fit.ts` (lib), `cli.ts` (CLI), `src/core/style.css` (themes), `src/human/main.ts` (Web UI)
