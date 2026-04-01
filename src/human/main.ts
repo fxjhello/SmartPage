@@ -7,6 +7,7 @@ import { SAMPLES } from './samples'
 import type { StyleSettings } from './controls'
 import '../core/style.css'
 import jsPDF from 'jspdf'
+import { parseFile, SUPPORTED_TYPES } from './file-import'
 
 let debounceTimer: ReturnType<typeof setTimeout> | null = null
 let lastLoadedFont = ''
@@ -261,7 +262,35 @@ function buildDOM(): void {
 
   const textareaHeader = document.createElement('div')
   textareaHeader.className = 'textarea-header'
-  textareaHeader.textContent = '粘贴 / 编辑 Markdown'
+
+  const headerLabel = document.createElement('span')
+  headerLabel.textContent = '粘贴 / 编辑 Markdown'
+
+  const importBtn = document.createElement('button')
+  importBtn.className = 'import-btn'
+  importBtn.textContent = '📎 导入文件'
+  importBtn.title = `支持 ${SUPPORTED_TYPES.join(', ')}`
+  importBtn.addEventListener('click', () => {
+    const input = document.createElement('input')
+    input.type = 'file'
+    input.accept = SUPPORTED_TYPES.join(',')
+    input.addEventListener('change', async () => {
+      const file = input.files?.[0]
+      if (!file) return
+      try {
+        textarea.value = '正在解析文件...'
+        const md = await parseFile(file)
+        textarea.value = md
+        localStorage.setItem(CACHE_KEY, md)
+        scheduleUpdate()
+      } catch (err) {
+        textarea.value = `解析失败: ${err instanceof Error ? err.message : '未知错误'}`
+      }
+    })
+    input.click()
+  })
+
+  textareaHeader.append(headerLabel, importBtn)
 
   // Markdown toolbar
   const toolbarContainer = document.createElement('div')
