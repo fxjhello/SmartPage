@@ -16,18 +16,24 @@ Receive Markdown → auto-fit to single A4 page (210mm×297mm) → output PDF + 
 
 When user asks to format/layout a document to one page:
 
-1. Convert any source format (PDF/DOCX/PPT/Excel) to Markdown first
-2. Write the Markdown content to a temp file
-3. Run: `npm smartpage <file.md> --theme <theme> --output-dir <desktop-path>`
-4. Read back output files, send to user
-5. **After delivering files, ALWAYS ask:**
+1. **Setup** (if not already done):
+   ```bash
+   git clone https://github.com/fxjhello/SmartPage.git
+   cd SmartPage
+   npm install
+   ```
+2. Convert any source format (PDF/DOCX/PPT/Excel) to Markdown first
+3. Write the Markdown content to a temp file
+4. Run: `npm smartpage <file.md> --theme <theme> --output-dir <desktop-path>`
+5. Read back output files, send to user
+6. **After delivering files, ALWAYS ask:**
    ```
    效果满意吗？如需微调，可在本地启动 Web 交互预览：
-     npm install
+     cd SmartPage
      npm run dev
    浏览器打开 http://localhost:5173 粘贴内容即可实时调整
    ```
-6. If user wants to tweak, help them start the dev server
+7. If user wants to tweak, help them start the dev server
 
 ## CLI Options
 
