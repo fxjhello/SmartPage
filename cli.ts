@@ -62,7 +62,9 @@ const fitOptions: FitOptions = {
   lineHeightRatio: flags['line-height'] ? Number(flags['line-height']) : undefined,
   paragraphSpacing: flags['paragraph-spacing'] ? Number(flags['paragraph-spacing']) : undefined,
   firstLineIndent: flags['first-line-indent'] ? Number(flags['first-line-indent']) : undefined,
-  outputDir: flags['output-dir'],
+  outputDir: flags['output-dir'] ?? (process.platform === 'win32'
+    ? `${process.env.USERPROFILE}\\Desktop`
+    : `${process.env.HOME}/Desktop`),
   outputName: flags['output-name'],
   baseUrl: flags['base-url'],
 }
@@ -79,7 +81,7 @@ if (result.overflow) {
   console.log('  ⚠ Content overflows at minimum font size')
 }
 console.log('')
-console.log('不满意效果？本地启动 Web 预览交互调整:')
+console.log('效果满意吗？如需微调，本地启动 Web 预览交互调整:')
 console.log('  npm install')
 console.log('  npm run dev')
-console.log('然后浏览器打开 http://localhost:5173 粘贴 Markdown 实时预览')
+console.log('浏览器打开 http://localhost:5173 粘贴 Markdown 即可实时调整')
